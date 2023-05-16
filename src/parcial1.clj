@@ -1,4 +1,5 @@
-(ns parcial1)
+(ns parcial1
+  (:require [clojure.set :as set]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ¡¡¡¡LEA CON ATENCIÓN!!! ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -47,9 +48,25 @@
 ;;    ubicada en tal posición es un diptongo o un hiato. En caso contrario, marcará false. 
 ;;    PISTA: Convendría definir las vocales; el namespace clojure.set puede ser de ayuda. (valor 5pts).
 
+
+;; Profe, para lograr la siguiente función me planteé que, para detectar si una palabra
+;; es diptongo o hiato, debe tener obligadamente dos vocales seguidas juntas, de forma secuencial.
+;; Para esto, ya que tenemos un vector de palabras como input, busque una funcion que me itere cada elemento.
+;; Usé mapv, que me pareció ideal para esto. Luego utilizo re-find para encontrar dos vocales consecutivas con una expresión regular
+;; que especifica que debe haber 2 coincidencias, y "%" que representa cada palabra de nuestro vector, es decir, el parámetro.
+;; Finalmente, como necesito que el output sean booleanos, uso la funcion "boolean" para obtener True si se detecta diptongo o hiato.
 (defn obtener-diptongos-y-hiatos
   [palabras]
-  nil)
+  (mapv #(boolean (re-find #"[aeiouáéíóú]{2}" %))
+        palabras))
+
+(def palabras ["hola" "Javier" "hiato" "compra" "murciélago"])
+
+(def output (obtener-diptongos-y-hiatos palabras))
+(println output)
+
+
+
 
 ;; 2. La siguiente función recibe como parámetro un número que representa la temperatura en grados celcius. Si la 
 ;;    temperatura se encuentra por debajo de los 0 grados debe retornar "helado"; si se encuentra entre los 0 y los 10 
@@ -63,14 +80,38 @@
 
 (defn evaluar-temperatura 
   [temp]
-  nil)
+   (cond
+    (< temp 0) "helado"
+    (<= temp 10) "frío"
+    (<= temp 18) "templado"
+    (<= temp 27) "fresco"
+    (<= temp 35) "caluroso"
+    :else "calor extremo"))
+
+(println (evaluar-temperatura 46.9))
 
 ;; 3. Esta función recibe como argumentos un mapa con la forma {:producto "producto1" :precio 3920} y un número que representa el descuento
 ;;    que se le va a aplicar. Debe devolver el mismo mapa con el precio actualizado. (valor 2.5pts)
 
+
+
+;; En esta consigna, uso la keyword local let para asignar un valor a una variable llamada precio-descuento (el precio con el descuento incluido).
+;; Este valor se calcula al multiplicar el precio del producto por la diferencia entre 1 y el resultado de dividir el descuento por 100.
+;; Finalmente, uso la función assoc para crear un nuevo mapa copiando el mapa del producto original, pero actualizando el valor del precio
+;; con el valor de la variable mencionada anteriormente precio-descuento. Como return,
+;; la función devuelve este un nuevo mapa/diccionario que contiene ya el producto con el descuento aplicado.
+
 (defn aplicar-descuento
   [producto descuento]
-  {:producto "X" :precio 0})
+  (let [precio-descuento (* (:precio producto) (- 1 (/ descuento 100)))]
+    (assoc producto :precio precio-descuento)))
+
+(def lista_precios {:producto "arroz" :precio 1000.1})
+(def descuento 10)
+
+
+(println (aplicar-descuento lista_precios descuento)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; EJERCICIO ADICIONAL ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -80,12 +121,24 @@
 ;;    en mayúsculas o contienen alguna letra en mayúscula (e.g. "retornar", "RETORNAR", "Retornar" y "retOrnar" son la misma palabra). Todas
 ;;    las palabras del vector output deben estar en minúsculas. (valor 2.5 pts)
 
+;; En esta última consigna, uso clojure.string/lower-case para que las palabras que estén escritas
+;; en mayúsculas o que contengan alguna letra en mayúscula sean tratadas como minúsculas.
+;; Luego, elimino las palabras duplicadas con la función distinct.
+;; Finalmente, vuelvo a convertir el output en un vector con la función vec.
+;; Cabe destacar que para resolver este ejercicio utilicé la macro de clojure "->>", que es muy similar
+;; a la pipe que estamos usando en R, específicamente con la librería dplyr. Esto me facilitó encadenar las distintas funciones
+;; que pensé para la función.
+
 (defn obtener-palabras-unicas
   [vec-palabras]
-  [])
+  (->> vec-palabras
+       (map clojure.string/lower-case)
+       distinct
+       vec))
 
 
-
+(println (obtener-palabras-unicas ["PaRRiLLa" "parrillA" "PARRILLA" "paRrilla" "palaBRA" "PALabra" "Otra" "OTra"]))
+         
 (comment
 
 
